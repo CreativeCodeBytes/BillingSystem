@@ -38,12 +38,7 @@
             background-color: #CC3700;
             color: white;
         }
-        #addStocksForm {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        #allProductsTable {
+        #addStocksForm, #allProductsTable, #generateBillSection, #myBillsSection {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -71,6 +66,19 @@
                 display: block;
             }
         }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printInvoice, #printInvoice * {
+                visibility: visible;
+            }
+            #printInvoice {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -91,17 +99,11 @@
                             </a>
                             <div class="collapse" id="billing-collapse">
                                 <ul class="nav flex-column ms-3">
-                                    <li class="nav-item"><a class="nav-link" href="#">My Bills</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="#">Generate Bills</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#" id="myBillsLink">My Bills</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#" id="generateBillLink">Create Bills</a></li>
                                     <li class="nav-item"><a class="nav-link" href="#">Edit Bills</a></li>
                                 </ul>
                             </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-plus-square me-2"></i>
-                                Create Bills
-                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#stock-collapse">
@@ -197,6 +199,70 @@
                     </div>
                 </div>
 
+                <!-- Generate Bill Section -->
+                <div id="generateBillSection" class="d-none p-4">
+                    <h2 class="mb-4">Generate Bill</h2>
+                    <div class="container">
+                        <div class="add-item mb-4">
+                            <h3>Add Item</h3>
+                            <div class="input-group">
+                                <input type="text" id="item-name" class="form-control" placeholder="Item name">
+                                <input type="number" id="item-price" class="form-control" placeholder="Item price">
+                                <input type="number" id="item-quantity" class="form-control" placeholder="Item quantity">
+                                <button id="add-item-btn" class="btn btn-primary">Add</button>
+                            </div>
+                        </div>
+                        <div class="items mb-4">
+                            <h3>Items</h3>  
+                            <ul id="item-list" class="list-group"></ul>
+                        </div>
+                        <div class="total mb-4">
+                            <button id="calculate-total-btn" class="btn btn-secondary">Calculate Total</button>
+                            <p id="total-price" class="mt-2"></p>
+                        </div>
+                        <div class="invoice">
+                            <h3>Invoice</h3>
+                            <ul id="invoice-list" class="list-group mb-3"></ul>
+                            <button id="generate-invoice-btn" class="btn btn-success">Generate Invoice</button>
+                        </div>
+                        <div>
+                            <button id="clear-all-btn" class="btn btn-danger mt-3">Clear All Items</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Bills Section -->
+                <div id="myBillsSection" class="d-none p-4">
+                    <h2 class="mb-4">My Bills</h2>
+                    <div class="mb-3">
+                        <input type="text" id="billSearch" class="form-control" placeholder="Search bills...">
+                    </div>
+                    <div id="billsList" class="list-group">
+                        <!-- Bills will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- Print Invoice Modal -->
+                <div class="modal fade" id="printInvoiceModal" tabindex="-1" aria-labelledby="printInvoiceModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="printInvoiceModalLabel">Invoice</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="printInvoice">
+                                    <!-- Invoice content will be dynamically added here -->
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="window.print()">Print Invoice</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Edit Product Modal -->
                 <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -208,10 +274,6 @@
                             <div class="modal-body">
                                 <form id="editProductForm">
                                     <input type="hidden" id="editProductId">
-                                    <div class="mb-3">
-                                        <label for="productId" class="form-label">Product ID</label>
-                                        <input type="text" class="form-control" id="productId" required>
-                                    </div>
                                     <div class="mb-3">
                                         <label for="editProductName" class="form-label">Product Name</label>
                                         <input type="text" class="form-control" id="editProductName" required>
@@ -241,4 +303,3 @@
     <script src="admin.js"></script>
 </body>
 </html>
-

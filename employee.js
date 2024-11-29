@@ -13,18 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
    
 
     // Check if user is logged in as admin
-    const loginAs = localStorage.getItem('loginAs');
-    const loginId = localStorage.getItem('loginId');
 
-    if (loginAs !== 'employee' || loginId !== 'emp001') {
-        window.location.href = 'login.html';
-    }
 
     logoutBtn.addEventListener('click', function(e) {
         e.preventDefault();
         localStorage.removeItem('loginAs');
         localStorage.removeItem('loginId');
-        window.location.href = 'login.html#login';
+        window.location.href = 'index.html';
     });
 
     addStocksLink.addEventListener('click', function(e) {
