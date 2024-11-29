@@ -1,0 +1,31 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.rounded-icon {
+    width: 80px;
+    height: 80px;
+    background-color: #007bff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.rounded-icon i {
+    font-size: 40px;
+    color: white;
+}
+
+.modal-content {
+    border-radius: 15px;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-body {
+    padding: 30px;
+}
