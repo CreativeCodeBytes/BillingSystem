@@ -38,7 +38,7 @@
             background-color: #CC3700;
             color: white;
         }
-        #addStocksForm, #allProductsTable, #generateBillSection, #myBillsSection {
+        #addStocksForm, #allProductsTable, #generateBillSection, #myBillsSection, #calculatorSection {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -101,7 +101,6 @@
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item"><a class="nav-link" href="#" id="myBillsLink">My Bills</a></li>
                                     <li class="nav-item"><a class="nav-link" href="#" id="generateBillLink">Create Bills</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="#">Edit Bills</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -118,7 +117,7 @@
                             </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="#" id="calculatorLink">
                                 <i class="bi bi-calculator me-2"></i>
                                 Calculator
                             </a>
@@ -242,6 +241,33 @@
                     </div>
                 </div>
 
+                <!-- Calculator Section -->
+                <div id="calculatorSection" class="d-none p-4">
+                    <h2 class="mb-4">Calculator</h2>
+                    <div id="calculator" class="bg-light p-3 rounded">
+                        <input type="text" id="calc-display" class="form-control mb-2" readonly>
+                        <div class="row g-2">
+                            <div class="col-3"><button class="btn btn-secondary w-100">7</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100">8</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100">9</button></div>
+                            <div class="col-3"><button class="btn btn-primary w-100">/</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100">4</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100">5</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100">6</button></div>
+                            <div class="col-3"><button class="btn btn-primary w-100">*</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100">1</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100">2</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100">3</button></div>
+                            <div class="col-3"><button class="btn btn-primary w-100">-</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100">0</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100">.</button></div>
+                            <div class="col-3"><button class="btn btn-success w-100">=</button></div>
+                            <div class="col-3"><button class="btn btn-primary w-100">+</button></div>
+                            <div class="col-12"><button class="btn btn-danger w-100">C</button></div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Print Invoice Modal -->
                 <div class="modal fade" id="printInvoiceModal" tabindex="-1" aria-labelledby="printInvoiceModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
@@ -303,3 +329,4 @@
     <script src="admin.js"></script>
 </body>
 </html>
+

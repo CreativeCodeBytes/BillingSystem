@@ -367,6 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div>
                     <button class="btn btn-sm btn-primary view-bill-btn" data-index="${index}">View</button>
                     <button class="btn btn-sm btn-secondary print-bill-btn" data-index="${index}">Print</button>
+                    <button class="btn btn-sm btn-warning edit-bill-btn" data-index="${index}">Edit</button>
                     <button class="btn btn-sm btn-danger delete-bill-btn" data-index="${index}">Delete</button>
                 </div>
             `;
@@ -384,6 +385,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.querySelectorAll('.delete-bill-btn').forEach(btn => {
             btn.addEventListener('click', deleteBill);
+        });
+
+        document.querySelectorAll('.edit-bill-btn').forEach(btn => {
+            btn.addEventListener('click', editBill);
         });
     }
 
@@ -457,11 +462,59 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function editBill(e) {
+        const index = e.target.getAttribute('data-index');
+        const myBills = JSON.parse(localStorage.getItem('myBills')) || [];
+        const bill = myBills[index];
+
+        // Populate the generate bill section with the bill data
+        billItems = bill.items;
+        updateItemList();
+        calculateTotal();
+
+        // Switch to the generate bill section
+        showSection(generateBillSection);
+    }
+
     billSearch.addEventListener('input', function() {
         displayMyBills(this.value);
     });
 
     // Initial setup
     showSection(mainContent);
+
+    // Add the following code to implement the calculator functionality
+    const calculatorLink = document.getElementById('calculatorLink');
+    const calculatorSection = document.getElementById('calculatorSection');
+
+    calculatorLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        showSection(calculatorSection);
+    });
+
+    function calculate() {
+        const display = document.getElementById('calc-display');
+        const buttons = document.querySelectorAll('#calculator button');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                const value = this.textContent;
+
+                if (value === 'C') {
+                    display.value = '';
+                } else if (value === '=') {
+                    try {
+                        display.value = eval(display.value);
+                    } catch (error) {
+                        display.value = 'Error';
+                    }
+                } else {
+                    display.value += value;
+                }
+            });
+        });
+    }
+
+    calculate();
 });
 
