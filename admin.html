@@ -38,7 +38,7 @@
             background-color: #CC3700;
             color: white;
         }
-        #addStocksForm, #allProductsTable, #generateBillSection, #myBillsSection, #calculatorSection {
+        #addStocksForm, #allProductsTable, #generateBillSection, #generateGSTBillSection, #myBillsSection, #calculatorSection {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -100,7 +100,17 @@
                             <div class="collapse" id="billing-collapse">
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item"><a class="nav-link" href="#" id="myBillsLink">My Bills</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="#" id="generateBillLink">Create Bills</a></li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#create-bills-collapse">
+                                            Create Bills
+                                        </a>
+                                        <div class="collapse" id="create-bills-collapse">
+                                            <ul class="nav flex-column ms-3">
+                                                <li class="nav-item"><a class="nav-link" href="#" id="generateBillLink">Regular Bill</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="#" id="generateGSTBillLink">GST Bill</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
@@ -226,6 +236,38 @@
                         </div>
                         <div>
                             <button id="clear-all-btn" class="btn btn-danger mt-3">Clear All Items</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate GST Bill Section -->
+                <div id="generateGSTBillSection" class="d-none p-4">
+                    <h2 class="mb-4">Generate GST Bill</h2>
+                    <div class="container">
+                        <div class="add-item mb-4">
+                            <h3>Add Item</h3>
+                            <div class="input-group">
+                                <input type="text" id="gst-item-name" class="form-control" placeholder="Item name">
+                                <input type="number" id="gst-item-price" class="form-control" placeholder="Item price">
+                                <input type="number" id="gst-item-quantity" class="form-control" placeholder="Item quantity">
+                                <button id="add-gst-item-btn" class="btn btn-primary">Add</button>
+                            </div>
+                        </div>
+                        <div class="items mb-4">
+                            <h3>Items</h3>  
+                            <ul id="gst-item-list" class="list-group"></ul>
+                        </div>
+                        <div class="total mb-4">
+                            <button id="calculate-gst-total-btn" class="btn btn-secondary">Calculate Total (with 18% GST)</button>
+                            <p id="gst-total-price" class="mt-2"></p>
+                        </div>
+                        <div class="invoice">
+                            <h3>GST Invoice</h3>
+                            <ul id="gst-invoice-list" class="list-group mb-3"></ul>
+                            <button id="generate-gst-invoice-btn" class="btn btn-success">Generate GST Invoice</button>
+                        </div>
+                        <div>
+                            <button id="clear-gst-all-btn" class="btn btn-danger mt-3">Clear All Items</button>
                         </div>
                     </div>
                 </div>

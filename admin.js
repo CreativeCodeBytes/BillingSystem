@@ -2,11 +2,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const addStocksLink = document.getElementById('addStocksLink');
     const seeAllProductsLink = document.getElementById('seeAllProductsLink');
     const generateBillLink = document.getElementById('generateBillLink');
+    const generateGSTBillLink = document.getElementById('generateGSTBillLink');
     const myBillsLink = document.getElementById('myBillsLink');
     const mainContent = document.getElementById('mainContent');
     const addStocksForm = document.getElementById('addStocksForm');
     const allProductsTable = document.getElementById('allProductsTable');
     const generateBillSection = document.getElementById('generateBillSection');
+    const generateGSTBillSection = document.getElementById('generateGSTBillSection');
     const myBillsSection = document.getElementById('myBillsSection');
     const stockForm = document.getElementById('stockForm');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -49,6 +51,11 @@ document.addEventListener('DOMContentLoaded', function() {
         showSection(generateBillSection);
     });
 
+    generateGSTBillLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        showSection(generateGSTBillSection);
+    });
+
     myBillsLink.addEventListener('click', function(e) {
         e.preventDefault();
         showSection(myBillsSection);
@@ -60,7 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
         addStocksForm.classList.add('d-none');
         allProductsTable.classList.add('d-none');
         generateBillSection.classList.add('d-none');
+        generateGSTBillSection.classList.add('d-none');
         myBillsSection.classList.add('d-none');
+        calculatorSection.classList.add('d-none');
         section.classList.remove('d-none');
         closeSidebarOnMobile();
     }
@@ -198,9 +207,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Generate Bill functionality
+    // Regular Bill functionality
     let billItems = [];
-    let invoiceId = 1;
+    let invoiceId = parseInt(localStorage.getItem('lastInvoiceId') || '0');
 
     const addItemBtn = document.getElementById('add-item-btn');
     const calculateTotalBtn = document.getElementById('calculate-total-btn');
@@ -267,26 +276,32 @@ document.addEventListener('DOMContentLoaded', function() {
     function generateInvoice() {
         const total = calculateTotal();
         const date = new Date().toISOString().split('T')[0];
+        invoiceId++;
         const invoice = {
-            id: invoiceId++,
+            id: invoiceId.toString().padStart(4, '0'),
             date: date,
             items: billItems,
-            total: total
+            total: total,
+            type: 'regular'
         };
 
         // Save to My Bills
         const myBills = JSON.parse(localStorage.getItem('myBills')) || [];
         myBills.push(invoice);
         localStorage.setItem('myBills', JSON.stringify(myBills));
+        localStorage.setItem('lastInvoiceId', invoiceId.toString());
 
         // Generate printable invoice
         const printInvoice = document.getElementById('printInvoice');
         printInvoice.innerHTML = `
-            <div style="border: 2px solid #000; padding: 20px;">
+            <div style="border: 4px solid #000; padding: 20px;">
                 <div class="d-flex align-items-center mb-4">
                     <img src="Cybromatech-logo1.jpg?height=50&width=50" alt="Company Logo" class="me-3">
                     <h2 class="m-0">Cybromatech Technology PVT. LTD.</h2>
                 </div>
+                <p><b>Add:-</b> Marisoft Tower, Pune 411014 <br><b>Phone:-</b> +91 1234567890</P>
+            </div>
+             <div style="border: 2px solid #000; padding: 20px;">
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong>Invoice ID:</strong> ${invoice.id}
@@ -346,6 +361,171 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('invoice-list').innerHTML = '';
     }
 
+    // GST Bill functionality
+    let gstBillItems = [];
+
+    const addGSTItemBtn = document.getElementById('add-gst-item-btn');
+    const calculateGSTTotalBtn = document.getElementById('calculate-gst-total-btn');
+    const generateGSTInvoiceBtn = document.getElementById('generate-gst-invoice-btn');
+    const clearGSTAllBtn = document.getElementById('clear-gst-all-btn');
+
+    addGSTItemBtn.addEventListener('click', addGSTItem);
+    calculateGSTTotalBtn.addEventListener('click', calculateGSTTotal);
+    generateGSTInvoiceBtn.addEventListener('click', generateGSTInvoice);
+    clearGSTAllBtn.addEventListener('click', clearGSTAll);
+
+    function addGSTItem() {
+        const itemName = document.getElementById('gst-item-name').value;
+        const itemPrice = parseFloat(document.getElementById('gst-item-price').value);
+        const itemQuantity = parseInt(document.getElementById('gst-item-quantity').value);
+
+        if (itemName && !isNaN(itemPrice) && !isNaN(itemQuantity)) {
+            gstBillItems.push({ name: itemName, price: itemPrice, quantity: itemQuantity });
+            updateGSTItemList();
+            clearGSTInputFields();
+        } else {
+            alert('Please enter valid item details.');
+        }
+    }
+
+    function updateGSTItemList() {
+        const itemList = document.getElementById('gst-item-list');
+        itemList.innerHTML = '';
+        gstBillItems.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            li.innerHTML = `
+                ${item.name} - Price: ₹${item.price.toFixed(2)} - Quantity: ${item.quantity}
+                <button class="btn btn-danger btn-sm remove-gst-item" data-index="${index}">Remove</button>
+            `;
+            itemList.appendChild(li);
+        });
+
+        // Add event listeners for remove buttons
+        document.querySelectorAll('.remove-gst-item').forEach(btn => {
+            btn.addEventListener('click', function() {
+                removeGSTItem(parseInt(this.getAttribute('data-index')));
+            });
+        });
+    }
+
+    function clearGSTInputFields() {
+        document.getElementById('gst-item-name').value = '';
+        document.getElementById('gst-item-price').value = '';
+        document.getElementById('gst-item-quantity').value = '';
+    }
+
+    function removeGSTItem(index) {
+        gstBillItems.splice(index, 1);
+        updateGSTItemList();
+    }
+
+    function calculateGSTTotal() {
+        const subtotal = gstBillItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const gst = subtotal * 0.18; // 18% GST
+        const total = subtotal + gst;
+        document.getElementById('gst-total-price').textContent = `Subtotal: ₹${subtotal.toFixed(2)}, GST (18%): ₹${gst.toFixed(2)}, Total: ₹${total.toFixed(2)}`;
+        return { subtotal, gst, total };
+    }
+
+    function generateGSTInvoice() {
+        const { subtotal, gst, total } = calculateGSTTotal();
+        const date = new Date().toISOString().split('T')[0];
+        invoiceId++;
+        const invoice = {
+            id: invoiceId.toString().padStart(4, '0'),
+            date: date,
+            items: gstBillItems,
+            subtotal: subtotal,
+            gst: gst,
+            total: total,
+            type: 'gst'
+        };
+
+        // Save to My Bills
+        const myBills = JSON.parse(localStorage.getItem('myBills')) || [];
+        myBills.push(invoice);
+        localStorage.setItem('myBills', JSON.stringify(myBills));
+        localStorage.setItem('lastInvoiceId', invoiceId.toString());
+
+        // Generate printable invoice
+        const printInvoice = document.getElementById('printInvoice');
+        printInvoice.innerHTML = `
+            <div style="border: 4px solid #000; padding: 20px;">
+                <div class="d-flex align-items-center mb-4">
+                    <img src="Cybromatech-logo1.jpg?height=50&width=50" alt="Company Logo" class="me-3">
+                    <h2 class="m-0">Cybromatech Technology PVT. LTD.</h2>
+                </div>
+               <p><b>Add:-</b> Marisoft Tower, Pune 411014 <br><b>Phone:-</b> +91 1234567890</P>
+            </div>
+            <div style="border: 2px solid #000; padding: 20px;">
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <strong>GST Invoice ID:</strong> ${invoice.id}
+                    </div>
+                    <div class="col-6 text-end">
+                        <strong>Date:</strong> ${invoice.date}
+                    </div>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${invoice.items.map(item => `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>₹${item.price.toFixed(2)}</td>
+                                <td>${item.quantity}</td>
+                                <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-end">Subtotal:</th>
+                            <th>₹${invoice.subtotal.toFixed(2)}</th>
+                        </tr>
+                        <tr>
+                            <th colspan="3" class="text-end">GST (18%):</th>
+                            <th>₹${invoice.gst.toFixed(2)}</th>
+                        </tr>
+                        <tr>
+                            <th colspan="3" class="text-end">Total:</th>
+                            <th>₹${invoice.total.toFixed(2)}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        `;
+
+        // Show print modal
+        const printInvoiceModal = new bootstrap.Modal(document.getElementById('printInvoiceModal'));
+        printInvoiceModal.show();
+
+        // Clear current bill
+        clearGSTAll();
+
+        // Refresh My Bills section if it's currently visible
+        if (!myBillsSection.classList.contains('d-none')) {
+            displayMyBills();
+        }
+
+        alert("GST Invoice generated and saved to My Bills!");
+    }
+
+    function clearGSTAll() {
+        gstBillItems = [];
+        updateGSTItemList();
+        document.getElementById('gst-total-price').textContent = '';
+        document.getElementById('gst-invoice-list').innerHTML = '';
+    }
+
     function displayMyBills(searchTerm = '') {
         const billsList = document.getElementById('billsList');
         billsList.innerHTML = '';
@@ -360,7 +540,7 @@ document.addEventListener('DOMContentLoaded', function() {
             billItem.className = 'list-group-item d-flex justify-content-between align-items-center';
             billItem.innerHTML = `
                 <div>
-                    <h5 class="mb-1">Invoice #${bill.id}</h5>
+                    <h5 class="mb-1">${bill.type === 'gst' ? 'GST Invoice' : 'Invoice'} #${bill.id}</h5>
                     <p class="mb-1">Date: ${bill.date}</p>
                     <small>Total: ₹${bill.total.toFixed(2)}</small>
                 </div>
@@ -374,39 +554,36 @@ document.addEventListener('DOMContentLoaded', function() {
             billsList.appendChild(billItem);
         });
 
-        // Add event listeners for view, print, and delete buttons
-        document.querySelectorAll('.view-bill-btn').forEach(btn => {
-            btn.addEventListener('click', viewBill);
-        });
-
-        document.querySelectorAll('.print-bill-btn').forEach(btn => {
-            btn.addEventListener('click', printBill);
-        });
-
-        document.querySelectorAll('.delete-bill-btn').forEach(btn => {
-            btn.addEventListener('click', deleteBill);
-        });
-
-        document.querySelectorAll('.edit-bill-btn').forEach(btn => {
-            btn.addEventListener('click', editBill);
+        // Add event listeners for view, print, edit, and delete buttons
+        document.querySelectorAll('.view-bill-btn, .print-bill-btn, .edit-bill-btn, .delete-bill-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                const action = this.classList.contains('view-bill-btn') ? viewBill :
+                               this.classList.contains('print-bill-btn') ? printBill :
+                               this.classList.contains('edit-bill-btn') ? editBill :
+                               deleteBill;
+                action(index);
+            });
         });
     }
 
-    function viewBill(e) {
-        const index = e.target.getAttribute('data-index');
-        const myBills = JSON.parse(localStorage.getItem('myBills')) || [];
-        const bill = myBills[index];
+    function viewBill(index) {
+        const bills = JSON.parse(localStorage.getItem('myBills')) || [];
+        const bill = bills[index];
 
         const printInvoice = document.getElementById('printInvoice');
         printInvoice.innerHTML = `
-            <div style="border: 2px solid #000; padding: 20px;">
+            <div style="border: 4px solid #000; padding: 20px;">
                 <div class="d-flex align-items-center mb-4">
                     <img src="Cybromatech-logo1.jpg?height=50&width=50" alt="Company Logo" class="me-3">
                     <h2 class="m-0">Cybromatech Technology PVT. LTD.</h2>
                 </div>
+                <p><b>Add:-</b> Marisoft Tower, Pune 411014 <br><b>Phone:-</b> +91 1234567890</P>
+            </div>
+                <div style="border: 2px solid #000; padding: 20px;">
                 <div class="row mb-3">
                     <div class="col-6">
-                        <strong>Invoice ID:</strong> ${bill.id}
+                        <strong>${bill.type === 'gst' ? 'GST Invoice' : 'Invoice'} ID:</strong> ${bill.id}
                     </div>
                     <div class="col-6 text-end">
                         <strong>Date:</strong> ${bill.date}
@@ -432,6 +609,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         `).join('')}
                     </tbody>
                     <tfoot>
+                        ${bill.type === 'gst' ? `
+                            <tr>
+                                <th colspan="3" class="text-end">Subtotal:</th>
+                                <th>₹${bill.subtotal.toFixed(2)}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3" class="text-end">GST (18%):</th>
+                                <th>₹${bill.gst.toFixed(2)}</th>
+                            </tr>
+                        ` : ''}
                         <tr>
                             <th colspan="3" class="text-end">Total:</th>
                             <th>₹${bill.total.toFixed(2)}</th>
@@ -445,45 +632,44 @@ document.addEventListener('DOMContentLoaded', function() {
         printInvoiceModal.show();
     }
 
-    function printBill(e) {
-        viewBill(e);
+    function printBill(index) {
+        viewBill(index);
         setTimeout(() => {
             window.print();
         }, 500);
     }
 
-    function deleteBill(e) {
-        if (confirm('Are you sure you want to delete this bill?')) {
-            const index = e.target.getAttribute('data-index');
-            let myBills = JSON.parse(localStorage.getItem('myBills')) || [];
-            myBills.splice(index, 1);
-            localStorage.setItem('myBills', JSON.stringify(myBills));
-            displayMyBills();
+    function editBill(index) {
+        const bills = JSON.parse(localStorage.getItem('myBills')) || [];
+        const bill = bills[index];
+
+        if (bill.type === 'gst') {
+            gstBillItems = bill.items;
+            updateGSTItemList();
+            calculateGSTTotal();
+            showSection(generateGSTBillSection);
+        } else {
+            billItems = bill.items;
+            updateItemList();
+            calculateTotal();
+            showSection(generateBillSection);
         }
     }
 
-    function editBill(e) {
-        const index = e.target.getAttribute('data-index');
-        const myBills = JSON.parse(localStorage.getItem('myBills')) || [];
-        const bill = myBills[index];
-
-        // Populate the generate bill section with the bill data
-        billItems = bill.items;
-        updateItemList();
-        calculateTotal();
-
-        // Switch to the generate bill section
-        showSection(generateBillSection);
+    function deleteBill(index) {
+        if (confirm('Are you sure you want to delete this bill?')) {
+            let bills = JSON.parse(localStorage.getItem('myBills')) || [];
+            bills.splice(index, 1);
+            localStorage.setItem('myBills', JSON.stringify(bills));
+            displayMyBills();
+        }
     }
 
     billSearch.addEventListener('input', function() {
         displayMyBills(this.value);
     });
 
-    // Initial setup
-    showSection(mainContent);
-
-    // Add the following code to implement the calculator functionality
+    // Calculator functionality
     const calculatorLink = document.getElementById('calculatorLink');
     const calculatorSection = document.getElementById('calculatorSection');
 
@@ -499,22 +685,41 @@ document.addEventListener('DOMContentLoaded', function() {
         buttons.forEach(button => {
             button.addEventListener('click', function() {
                 const value = this.textContent;
-
-                if (value === 'C') {
-                    display.value = '';
-                } else if (value === '=') {
-                    try {
-                        display.value = eval(display.value);
-                    } catch (error) {
-                        display.value = 'Error';
-                    }
-                } else {
-                    display.value += value;
-                }
+                handleCalculatorInput(value);
             });
+        });
+
+        // Add keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            if (calculatorSection.classList.contains('d-none')) return;
+            
+            if (/[0-9+\-*/.=]|Backspace|Enter/.test(key)) {
+                event.preventDefault();
+                handleCalculatorInput(key);
+            }
         });
     }
 
+    function handleCalculatorInput(value) {
+        const display = document.getElementById('calc-display');
+        
+        if (value === 'C' || value === 'Backspace') {
+            display.value = display.value.slice(0, -1);
+        } else if (value === '=' || value === 'Enter') {
+            try {
+                display.value = eval(display.value);
+            } catch (error) {
+                display.value = 'Error';
+            }
+        } else {
+            display.value += value;
+        }
+    }
+
     calculate();
+
+    // Initial setup
+    showSection(mainContent);
 });
 
