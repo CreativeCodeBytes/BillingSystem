@@ -79,6 +79,18 @@
                 top: 0;
             }
         }
+        @media (max-width: 767px) {
+            #printInvoice table {
+                font-size: 12px;
+            }
+            #printInvoice th, #printInvoice td {
+                padding: 0.3rem;
+            }
+            #printInvoice .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
     </style>
 </head>
 <body>
@@ -319,7 +331,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <div id="printInvoice">
+                                <div id="printInvoice" class="table-responsive">
                                     <!-- Invoice content will be dynamically added here -->
                                 </div>
                             </div>
