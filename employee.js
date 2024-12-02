@@ -221,8 +221,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function generateInvoice() {
         const total = calculateTotal();
         const date = new Date().toISOString().split('T')[0];
+        invoiceId++;
         const invoice = {
-            id: invoiceId++,
+            id: invoiceId,
             date: date,
             items: billItems,
             total: total,
@@ -242,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <img src="Cybromatech-logo1.jpg?height=50&width=50" alt="Company Logo" class="me-3">
                     <h2 class="m-0">Cybromatech Technology PVT. LTD.</h2>
                 </div>
-                <p><b>Add:-</b> Marisoft Tower, Pune 411014 <br><b>Phone:-</b> +91 1234567890</P>
+                <p><b>Add:-</b> Marisoft Tower, Pune 411014 <br><b>Phone:-</b> +91 1234567890</p>
             </div>
             <div style="border: 2px solid #000; padding: 20px;">
                 <div class="row mb-3">
@@ -253,32 +254,34 @@ document.addEventListener('DOMContentLoaded', function() {
                         <strong>Date:</strong> ${invoice.date}
                     </div>
                 </div>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Item Name</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${invoice.items.map(item => `
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
                             <tr>
-                                <td>${item.name}</td>
-                                <td>₹${item.price.toFixed(2)}</td>
-                                <td>${item.quantity}</td>
-                                <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                                <th>Item Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="3" class="text-end">Total:</th>
-                            <th>₹${invoice.total.toFixed(2)}</th>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${invoice.items.map(item => `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>₹${item.price.toFixed(2)}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Total:</th>
+                                <th>₹${invoice.total.toFixed(2)}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         `;
 
@@ -375,8 +378,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function generateGSTInvoice() {
         const { subtotal, gst, total } = calculateGSTTotal();
         const date = new Date().toISOString().split('T')[0];
+        gstInvoiceId++;
         const invoice = {
-            id: gstInvoiceId++,
+            id: gstInvoiceId,
             date: date,
             items: gstBillItems,
             subtotal: subtotal,
@@ -398,9 +402,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <img src="Cybromatech-logo1.jpg?height=50&width=50" alt="Company Logo" class="me-3">
                     <h2 class="m-0">Cybromatech Technology PVT. LTD.</h2>
                 </div>
-                <p><b>Add:-</b> Marisoft Tower, Pune 411014 <br><b>Phone:-</b> +91 1234567890</P>
+                <p><b>Add:-</b> Marisoft Tower, Pune 411014 <br><b>Phone:-</b> +91 1234567890</p>
             </div>
-            div style="border: 2px solid #000; padding: 20px;">
+            <div style="border: 2px solid #000; padding: 20px;">
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong>GST Invoice ID:</strong> ${invoice.id}
@@ -409,40 +413,42 @@ document.addEventListener('DOMContentLoaded', function() {
                         <strong>Date:</strong> ${invoice.date}
                     </div>
                 </div>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Item Name</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${invoice.items.map(item => `
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
                             <tr>
-                                <td>${item.name}</td>
-                                <td>₹${item.price.toFixed(2)}</td>
-                                <td>${item.quantity}</td>
-                                <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                                <th>Item Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="3" class="text-end">Subtotal:</th>
-                            <th>₹${invoice.subtotal.toFixed(2)}</th>
-                        </tr>
-                        <tr>
-                            <th colspan="3" class="text-end">GST (18%):</th>
-                            <th>₹${invoice.gst.toFixed(2)}</th>
-                        </tr>
-                        <tr>
-                            <th colspan="3" class="text-end">Total:</th>
-                            <th>₹${invoice.total.toFixed(2)}</th>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${invoice.items.map(item => `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>₹${item.price.toFixed(2)}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Subtotal:</th>
+                                <th>₹${invoice.subtotal.toFixed(2)}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3" class="text-end">GST (18%):</th>
+                                <th>₹${invoice.gst.toFixed(2)}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3" class="text-end">Total:</th>
+                                <th>₹${invoice.total.toFixed(2)}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         `;
 
@@ -515,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <img src="Cybromatech-logo1.jpg?height=50&width=50" alt="Company Logo" class="me-3">
                     <h2 class="m-0">Cybromatech Technology PVT. LTD.</h2>
                 </div>
-                <p><b>Add:-</b> Marisoft Tower, Pune 411014 <br><b>Phone:-</b> +91 1234567890</P>
+                <p><b>Add:-</b> Marisoft Tower, Pune 411014 <br><b>Phone:-</b> +91 1234567890</p>
             </div>
             <div style="border: 2px solid #000; padding: 20px;">
                 <div class="row mb-3">
@@ -526,42 +532,44 @@ document.addEventListener('DOMContentLoaded', function() {
                         <strong>Date:</strong> ${bill.date}
                     </div>
                 </div>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Item Name</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${bill.items.map(item => `
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
                             <tr>
-                                <td>${item.name}</td>
-                                <td>₹${item.price.toFixed(2)}</td>
-                                <td>${item.quantity}</td>
-                                <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                                <th>Item Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                    <tfoot>
-                        ${bill.type === 'gst' ? `
+                        </thead>
+                        <tbody>
+                            ${bill.items.map(item => `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>₹${item.price.toFixed(2)}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot>
+                            ${bill.type === 'gst' ? `
+                                <tr>
+                                    <th colspan="3" class="text-end">Subtotal:</th>
+                                    <th>₹${bill.subtotal.toFixed(2)}</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="3" class="text-end">GST (18%):</th>
+                                    <th>₹${bill.gst.toFixed(2)}</th>
+                                </tr>
+                            ` : ''}
                             <tr>
-                                <th colspan="3" class="text-end">Subtotal:</th>
-                                <th>₹${bill.subtotal.toFixed(2)}</th>
+                                <th colspan="3" class="text-end">Total:</th>
+                                <th>₹${bill.total.toFixed(2)}</th>
                             </tr>
-                            <tr>
-                                <th colspan="3" class="text-end">GST (18%):</th>
-                                <th>₹${bill.gst.toFixed(2)}</th>
-                            </tr>
-                        ` : ''}
-                        <tr>
-                            <th colspan="3" class="text-end">Total:</th>
-                            <th>₹${bill.total.toFixed(2)}</th>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         `;
 
